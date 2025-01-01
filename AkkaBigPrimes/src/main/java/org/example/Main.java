@@ -2,6 +2,7 @@ package org.example;
 
 import akka.actor.typed.ActorSystem;
 
+
 public class Main {
     /*
     public static void main(String[] args) {
@@ -16,5 +17,6 @@ public class Main {
     public static void main(String[] args) {
         ActorSystem<ManagerBehavior.Command> bigPrimes = ActorSystem.create(ManagerBehavior.create(), "BigPrimes");
         bigPrimes.tell(new ManagerBehavior.InstructionCommand("start"));
+
     }
 }
