@@ -28,6 +28,7 @@ public class WorkerBehavior extends AbstractBehavior<WorkerBehavior.Command> {
             return sender;
         }
     }
+
     private WorkerBehavior(ActorContext<Command> context) {
         super(context);
     }
@@ -36,20 +37,27 @@ public class WorkerBehavior extends AbstractBehavior<WorkerBehavior.Command> {
         return Behaviors.setup(WorkerBehavior::new);
     }
 
-    private BigInteger prime;
-
     @Override
     public Receive<Command> createReceive() {
+        return handleMessagesWhenWeDontHaveAPrimeNumber();
+    }
+
+    public Receive<Command> handleMessagesWhenWeDontHaveAPrimeNumber() {
         return newReceiveBuilder()
                 .onAnyMessage(command -> {
-                    if(command.getMessage().equals("start")){
-                        if(prime == null){
-                                BigInteger bigInteger = new BigInteger(2000, new Random());
-                                prime = bigInteger.nextProbablePrime();
-                        }
+                    BigInteger bigInteger = new BigInteger(2000, new Random());
+                    BigInteger prime = bigInteger.nextProbablePrime();
+                    command.getSender().tell(new ManagerBehavior.ResultCommand(prime));
+                    return handleMessagesWhenWeAlreadyHaveAPrimeNumber(prime);
+                })
+                .build();
+    }
+
+    public Receive<Command> handleMessagesWhenWeAlreadyHaveAPrimeNumber(BigInteger prime){
+        return newReceiveBuilder()
+                .onAnyMessage(command -> {
                         command.getSender().tell(new ManagerBehavior.ResultCommand(prime));
-                    }
-                    return this;
+                    return Behaviors.same();
                 })
                 .build();
     }
